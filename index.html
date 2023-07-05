@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;700&display=swap');
+
+        * {
+            font-family: "roboto", sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            background-color: rgb(245, 245, 245);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            background-color: #ffffff;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+            background-color: #989898;
+        }
+
+        body {
+            background-color: rgb(240, 240, 420);
+        }
+
+        div.container {
+            flex-direction: column;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        div.card {
+            transition: opacity 0.2s ease-out;
+            background-color: white;
+            width: 1024px;
+            height: 300px;
+            display: flex;
+            justify-content: flex-start;
+            border-radius: 25px;
+            box-shadow: rgba(0, 0, 0, 1) 0px 10px 15px -3px,
+                rgba(0, 0, 0, 0.05)0px 4px 6px -2px;
+        }
+
+        div.card.fade-out {
+            opacity: 0;
+        }
+
+        img {
+            height: 100%;
+            box-shadow: rgba(0, 0, 0, 1)0px 0px 5px 0px,
+                rgba(0, 0, 0, 1)0px 0px 1px 0px;
+            border-radius: 25px;
+            aspect-ratio: 1.6;
+            object-fit: cover;
+        }
+
+        div.navbar {
+            background-color: rgb(50 50 50);
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0px;
+            padding: 15px;
+        }
+
+        div.navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 1024px;
+        }
+
+        div.navbar-content h1 {
+            color: white;
+        }
+
+        button {
+            background-color: rgb(7, 131, 153);
+            color: rgb(255, 255, 255);
+            padding: 10px;
+            border-radius: 25px;
+            border: 0;
+            font-weight: bold;
+            cursor: pointer;
+            width: 150px;
+        }
+
+        input {
+            padding: 7px;
+            border-radius: 25px;
+            border: 1px solid rgb(170, 170, 170)
+        }
+
+        div.modal-background {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(50, 50, 50, 0.5);
+            z-index: 10;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        div.modal {
+            padding: 10px;
+            background-color: white;
+            border-radius: 25px;
+            width: 1024px;
+
+            box-shadow: rgba(0, 0, 0, 0.1) opx 10px 15px -3px,
+                rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+
+        }
+
+        div.modal-content {
+            display: flex;
+            flex-direction: column;
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+        }
+
+        div.modal-content input {
+            margin-bottom: 10px;
+
+        }
+
+        div.header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        div.header span {
+            cursor: pointer;
+
+        }
+
+        div.card-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 15px;
+        }
+
+        .card .notes {
+            height: 100%;
+            overflow-y: auto;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="modal-background" id="modal">
+        <div class="modal">
+            <div class="header">
+                <h1>Dodaj recept</h1>
+                <span onclick="closeModal()">X</span>
+            </div>
+            <form id="add-recepie">
+                <div class="modal-content">
+                    <label>Naziv recepta</label>
+                    <input name="naziv" required minlength="5" placeholder="Naziv recepta" />
+                    <label>Povezava do slike</label>
+                    <input name="link" required minlength="5" placeholder="Povezava do slike" />
+                    <label>Opis</label>
+                    <input name="notes" required minlength="5" placeholder="Opis" />
+                </div>
+                <button>Dodaj</button>
+            </form>
+        </div>
+    </div>
+    <div class="navbar">
+        <div class="navbar-content">
+            <h1>Recepti</h1>
+            <div>
+                <button onclick="openModal()">Dodaj recept</button>
+                <input id="search" placeholder="IŠČI">
+            </div>
+        </div>
+    </div>
+    <div class="container" id="list">
+        <div class="card">
+            <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUOK_T4bhazgPWUS3HJTB5XwHcRXHw9Js-PnMlauvdt9kO93WEqwOkbnM2xONiWKHhOtU" />
+            <div class="card-content">
+                <div class="header">
+                    <h1>Palačinke</h1>
+                    <span onclick="deleteRecepie(this)">X</span>
+                </div>
+                <div class="notes">
+                    <h2> V skledo stresemo moko. Dodamo soli in sladkor, dobro premešamo in na sredini naredimo jamico.
+                        V
+                        jamico ubijemo jajci ter prilijemo približno 50 ml mleka in eno žlico olja.
+                        <br>
+                        Sestavine v jamici pričnemo mešati z ročno metlico ali mešalnikom in med mešanjem postopoma
+                        zajemamo
+                        moko okoli jamice. Mešamo tako dolgo, da v zmes vmešam
+                        <br>
+                        Nato med nenehnim mešanjem v tankem curku v skledo počasi vlivamo preostalo mleko. Ko prilijemo
+                        vse
+                        mleko in dobimo gladko in tekoče testo, prenehamo z mešanjem. Masa mora biti tekoča, vendar ne
+                        sme
+                        biti vodena. Če je vodena, dodamo še malo moke.
+                        <br>
+                        Pripravljeno maso pred peko pustimo počivati 15 do 30 minut, da lahko škrobna zrnca v tekočini
+                        nabreknejo.
+                    </h2>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card">
+            <img src="https://www.slovenskenovice.si/media/images/20210417/922171.width-932.jpg" />
+            <div class="card-content">
+                <div class="header">
+                    <h1>Keksi</h1>
+                    <span onclick="deleteRecepie(this)">X</span>
+                </div>
+                <div class="notes">
+                    <h2>Pečico segrejemo na 190 stopinj Celzija. Dva nizka pekača za piškote obložimo s papirjem za
+                        peko. V
+                        skledi zmešamo moko, sodo bikarbono in sol.
+
+                        V skledi kremasto umešamo zmehčano maslo in obe vrsti sladkorja. V masleno zmes vmešamo
+                        vanilijevo
+                        aromo in jajce
+
+                        Na jajčno-masleno zmes presejemo mešanico moke, sode bikarbone in soli. Dobro premešamo z
+                        lopatko
+                        (lahko tudi mešalnikom, natavljenim na najnižjo hitrost), da dobimo gladko in enotno testo, v
+                        katerega čisto na koncu vmešamo čokoladne koščke.
+
+                        Testo zajemamo z žličko in na pripravljena pekača polagamo manjše kupčke testa. Pazimo, da je
+                        med
+                        posameznimi kupčki dovolj razmaka, saj se piškoti med peko nekoliko razlezejo. Piškote pečemo v
+                        ogreti pečici 10 do 14 minut.
+
+                        Pečene piškote pustimo na pekaču nekaj minut, da se malo ohladijo in učvrstijo.
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://www.tuscc.si/cache/thumbs/53f199e7be0c845f10cc3ad6/600x600-c2/3831029320681-1.jpg" />
+            <div class="card-content">
+                <div class="header">
+                    <h1>Babičina marmelada</h1>
+                    <span onclick="deleteRecepie(this)">X</span>
+                </div>
+                <div class="notes">
+                    <h2>Koščke marelic stresemo v lonec in posujemo s sladkorjem.Dobro premešamo, lonec čez noč shranimo
+                        v
+                        hladilnik.Naslednji dan si najprej pripravimo kozarce za vlaganje. Kozarce in pokrovčke
+                        temeljito
+                        operemo in vsaj za 15 minut potisnemo v pečico, ki smo jo ogreli na 80 stopinj. Lonec z
+                        marelicami pristavimo na kuhalnik. Med nenehnim mešanjem kuhamo na zmerni temperaturi toliko
+                        časa,
+                        da sadje zavre. Ko zavre, pustimo vreti še 4 do 5 minut. S površine pobiramo pene,
+                        ki so se naredile med kuhanjem. Če se naguba, je gotova.
+
+                        Marmelado gladko zmiksamo s paličnim mešalnikom. Še vročo marmelado nadevamo v vroče kozarce.
+                        Kozarce napolnemo. Kozarce zapremo, obrnemo s pokrovčkom navzdol, pokrijemo s preganjeno odejo
+                        ter
+                        pustimo, da se počasi ohladijo.
+                    </h2>
+                </div>
+                </h2>
+            </div>
+        </div>
+        <div class="card">
+            <img src="https://oblizniprste.si/wp-content/uploads/2015/09/golaz-7.jpg" />
+            <div class="card-content">
+                <div class="header">
+                    <h1>Domači golaž</h1>
+                    <span onclick="deleteRecepie(this)">X</span>
+                </div>
+                <div class="notes">
+                    <h2>Goveje meso narežemo na kocke. Čebulo
+                        olupimo in narežemo na tanke rezine ali pa jo drobno sesekljamo. Česen olupimo in sesekljamo.
+
+
+                        Na kuhalnik pristavimo lonec z oljem. Ko se olje segreje, v lonec stresemo čebulo in jo
+                        posolimo. Čebulo med mešanjem pražimo toliko časa, da postekleni in izloči sok. Ko čebula
+                        postekleni, dodamo česen in vse skupaj pražimo še toliko časa, da
+                        česen zadiši.
+
+                        V lonec stresemo mesa in mešamo še toliko časa, da meso porjavi. Pazimo, da se meso ne
+                        prepeče. Med stalnim mešanjem dodamo paradižnikovo mezgo in mleto rdečo papriko. Zalijemo z
+                        vodo,
+                        dodamo lovorova lista, premešamo in lonec pokrijemo. Po okusu solimo in popramo.
+                        Znižamo temperaturo in zelo počasi kuhamo še od dve do tri ure oziroma toliko časa, da se vsa
+                        čebula
+                        razpusti v omako. Po potrebiprilijemo še tekočino.
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+<script>
+var iskanje = document.getElementById("search");
+
+var dodajForm = document.getElementById("add-recepie");
+
+var modal = document.getElementById("modal");
+
+var list = document.getElementById("list");
+
+window.addEventListener("load", renderList)
+
+
+iskanje.addEventListener('keyup', function (event) {
+  var vrednostiskanja = event.target.value.toLowerCase();
+  var recepti = document.getElementsByClassName('card')
+  for (var recept of recepti) {
+    recept.style.display = "none";
+    var nazivrecepta = recept.getElementsByTagName("h1")[0].innerHTML.toLowerCase();
+    var prikazi = nazivrecepta.includes(vrednostiskanja);
+    if (prikazi) {
+      recept.style.display = "flex";
+    } else {
+      recept.style.display = "none";
+    }
+  }
+
+});
+dodajForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  var naziv = event.srcElement.elements["naziv"].value;
+  var link = event.srcElement.elements["link"].value;
+  var notes = event.srcElement.elements["notes"].value;
+
+  list.innerHTML += `
+  <div class="card">
+    <img src="${link}"/>
+    
+
+    <div class="card-content">
+      <div class="header">
+
+        <h1>${naziv}</h1>
+        <span onclick="deleteRecepie(this)">X</span>
+      </div>
+
+      <div class="note">
+        ${notes}
+        <h2>         
+        </h2>
+      </div>
+    </div>
+  </div>
+  `;
+
+  event.srcElement.reset();
+  closeModal();
+  saveList();
+
+
+});
+
+function deleteRecepie(element) {
+  var potrdi = confirm("ali ste prepričani da želite izbrisati recept?")
+  if (potrdi)
+    var kartica = element.parentNode.parentNode.parentNode;
+  kartica.classList.add("fade-out");
+
+  setTimeout(function () {
+
+    kartica.remove();
+    saveList();
+  }, 200);
+}
+
+function openModal() {
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+
+function saveList() {
+  localStorage.setItem("list", list.innerHTML);
+  return novList ?? "";
+}
+
+function renderList() {
+  var novList = localStorage.getItem("list");
+  if (novList) {
+
+    list.innerHTML = novList;
+    var recepti = document.getElementsByClassName('card')
+    for (var recept of recepti) {
+      recept.style.display = "flex";
+    }
+  }
+}
+</script
+
+</html>
